@@ -12,7 +12,8 @@ type Broadcast interface {
 	SendAll(event string, args ...interface{})    // SendAll will send an event with args to all the rooms
 	Len(room string) int                          // Len gives number of connections in the room
 	Rooms(connection Conn) []string               // Gives list of all the rooms if no connection given, else list of all the rooms the connection joined
-	ConnectionIDs(room string) []string		  // Gives list of connection ids in the room
+	ConnectionIDs(room string) []string		      // Gives list of connection ids in the room
+	Connection(connectionID string) Conn		  // Gives connection of provided connectionId
 }
 
 // broadcast gives Join, Leave & BroadcastTO server API support to socket.io along with room management
@@ -136,6 +137,23 @@ func (broadcast *broadcast) ConnectionIDs(room string) []string {
 	}
 
 	return connectionIDs
+}
+
+// Gives connection of provided connectionId
+func (broadcast *broadcast) Connection(connectionID string) Conn {
+	broadcast.lock.RLock()
+	defer broadcast.lock.RUnlock()
+
+	var connection Conn
+
+	for _, connections := range broadcast.rooms {
+		// check if the connection is joined to the room
+		if _, ok := connections[connectionID]; ok {
+			connection = connections[connectionID]
+		}
+	}
+
+	return connection
 }
 
 // Rooms gives the list of all the rooms available for broadcast in case of

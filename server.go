@@ -107,6 +107,11 @@ func (s *Server) RoomConnectionIDs(room string) []string {
 	return s.broadcast.ConnectionIDs(room)
 }
 
+// GetConnection gives connection details of provided connectionID
+func (s *Server) GetConnection(connectionID string) Conn {
+	return s.broadcast.Connection(connectionID)
+}
+
 //  Rooms gives list of all the rooms
 func (s *Server) Rooms() []string {
 	return s.broadcast.Rooms(nil)
